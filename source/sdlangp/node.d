@@ -30,7 +30,8 @@ struct Node {
     this.values = values;
     this.attrs = attrs;
     this.children = children;
-    parent.children ~= &this;
+    if (parent !is null)
+      parent.children ~= &this;
   }
 }
 

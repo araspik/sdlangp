@@ -105,7 +105,7 @@ import sumtype;
 
 /// Custom parser for single nodes.
 @safe Node* parseNode(ParseTree node) nothrow {
-  Node* res = new Node(null, "", "");
+  Node* res = new Node(null);
 
   foreach (t; node.children) switch (t.name[4 .. $]) {
     case "TagName":
