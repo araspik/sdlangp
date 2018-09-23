@@ -1,0 +1,32 @@
+SDL:
+    TagTree  <- Line*
+    Line     <  Tag (:';' Tag)* :EOL
+    Tag      <  (Value / TagName) (Value :Spacing)* (Attribute Spacing)* (:'{' :EOL TagTree :'}')?
+
+    TagName  <- ;Namespace? ~([a-z][a-zA-Z0-9_.$\-]*)?
+    AttrName <- ~([a-zA-Z0-9_]+)
+    Namespace <- ~([a-z][a-zA-Z0-9_.$\-]*)? :':'
+
+    Value    <- String / DateTime / Duration / Float / Number / Base64 / Boolean / Null
+    Attribute <- AttrName :'=' Value
+
+    String   <~ :doublequote (:backslash doublequote / !doublequote !endOfLine .)* :doublequote
+      / :backquote (!backquote !endOfLine .)* :backquote
+    DateTime <  Date Time?
+    Date     <~ Digit Digit Digit Digit :'/' Digit Digit :'/' Digit Digit
+    Time     <- ~(Digit Digit :':' Digit Digit :':' Digit Digit) :'.' ~(Digit Digit Digit) UTC?
+    Duration <- ~(Digit+ 'd' :':')? ~(Digit Digit :':' Digit Digit :':' Digit Digit) ~('.' Digit Digit Digit)?
+    Number   <~ Digit+ ('L' / 'BD')?
+    Float    <~ Digit+ '.' Digit+ 'f'?
+    Boolean  <- "true" / "false" / "on" / "off"
+    Null     <- "null"
+    Base64   <- :'[' ~(([a-zA-Z+0-9/] / :Spacing)*) :']'
+    UTC      <- "-UTC"
+
+    Digit    <- [0-9]
+    Char     <- !doublequote !endOfLine . / backslash doublequote
+    Spacing  <- BlockComment / backslash endOfLine / :(' ' / '\t')*
+    EOL      <: endOfLine / LineComment
+
+    LineComment  <- :("//" / "--" / "#") (!endOfLine .)* endOfLine
+    BlockComment <- "/*" (!"*/" .)* "*/"
