@@ -36,7 +36,7 @@ import sumtype;
       // ...BD: 128-bit
       return data[$-1] == 'L'
         ? Value(data[0 .. $-1].to!long)
-        : data[$-2] == 'D'
+        : (data.length > 2 && data[$-2] == 'B')
         ? Value(BigInt(data[0 .. $-2]))
         : Value(data.to!int);
     case "Float":
@@ -92,12 +92,6 @@ import sumtype;
   }
 }
 
-/// Custom parser for attributes.
-@safe Attribute parseAttribute(ParseTree node) nothrow {
-  return Attribute(node.children[0].matches[0].idup,
-      node.children[1].parseValue.assumeWontThrow);
-}
-
 /// Custom parser for node trees.
 @safe Node*[] parseTree(ParseTree node) nothrow {
   return node.children.map!(l => l.children.map!parseNode).join;
@@ -116,7 +110,8 @@ import sumtype;
       res.values ~= t.parseValue.assumeWontThrow;
       break;
     case "Attribute":
-      res.attrs ~= t.parseAttribute;
+      res.attrs[t.children[0].matches[0]] =
+        t.children[1].parseValue.assumeWontThrow;
       break;
     case "TagTree":
       res.children = t.parseTree;

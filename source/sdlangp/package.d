@@ -12,7 +12,7 @@ import sdlangp.parser, sdlangp.grammar;
 @trusted Node* parseSource(string source) nothrow {
   import std.exception;
 
-  return new Node(null, "", "", [], [],
+  return new Node(null, "", "", [], null,
       SDL(source).assumeWontThrow.children[0].parseTree);
 }
 
